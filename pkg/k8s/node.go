@@ -123,7 +123,7 @@ func ParseNode(k8sNode *slim_corev1.Node, source source.Source) *nodeTypes.Node 
 		Source:        source,
 		EncryptionKey: encryptKey,
 	}
-
+	// 先尝试从 Spec.PodCIDRs 或 Spec.PodCIDR 中提取有效值 赋予 newNode.IPv4AllocCIDR
 	if len(k8sNode.Spec.PodCIDRs) != 0 {
 		if len(k8sNode.Spec.PodCIDRs) > 2 {
 			scopedLog.WithField("podCIDR", k8sNode.Spec.PodCIDRs).Errorf("Invalid PodCIDRs expected 1 or 2 PodCIDRs, received %d", len(k8sNode.Spec.PodCIDRs))
@@ -154,6 +154,7 @@ func ParseNode(k8sNode *slim_corev1.Node, source source.Source) *nodeTypes.Node 
 	// Spec.PodCIDR takes precedence since it's
 	// the CIDR assigned by k8s controller manager
 	// In case it's invalid or empty then we fall back to our annotations.
+	// 当Spec.PodCIDRs 和 Spec.PodCIDR 没有有效值时，尝试从 annotation 中提取值进行使用，将其赋予 newNode.IPv4AllocCIDR
 	if newNode.IPv4AllocCIDR == nil {
 		if ipv4CIDR, ok := k8sNode.Annotations[annotation.V4CIDRName]; !ok || ipv4CIDR == "" {
 			scopedLog.Debug("Empty IPv4 CIDR annotation in node")

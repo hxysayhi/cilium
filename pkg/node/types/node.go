@@ -83,7 +83,10 @@ func (n *Node) ToCiliumNode() *ciliumv2.CiliumNode {
 		healthIPv4, healthIPv6 string
 		annotations            = map[string]string{}
 	)
-
+	// 在 pkg/k8s/node.go 中 ParseNode 实现了将  kubernetes node 转化为 cilium node 的过程
+	// 关于 IPv4AllocCIDR 的处理：
+	// 先尝试从 Spec.PodCIDRs 或 Spec.PodCIDR 中提取有效值 赋予 newNode.IPv4AllocCIDR
+	// 当Spec.PodCIDRs 和 Spec.PodCIDR 没有有效值时，尝试从 annotation 中提取值进行使用，将其赋予 newNode.IPv4AllocCIDR
 	if n.IPv4AllocCIDR != nil {
 		podCIDRs = append(podCIDRs, n.IPv4AllocCIDR.String())
 	}

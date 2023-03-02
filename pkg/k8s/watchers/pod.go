@@ -119,7 +119,7 @@ func (k *K8sWatcher) podsInit(k8sClient kubernetes.Interface, asyncControllers *
 		// Only watch for pod events for our node.
 		podStore, podController := k.createPodController(
 			k8sClient.CoreV1().RESTClient(),
-			fields.ParseSelectorOrDie("spec.nodeName="+nodeTypes.GetName()))
+			fields.ParseSelectorOrDie("spec.nodeName="+nodeTypes.GetName())) // 指定筛选当前节点上的pod
 		isConnected := make(chan struct{})
 		k.podStoreMU.Lock()
 		k.podStore = podStore
